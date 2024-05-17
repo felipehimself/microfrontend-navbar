@@ -70,6 +70,7 @@ export default defineConfig(({ mode }) => {
           '@mui/material',
           '@emotion/react',
           '@emotion/styled',
+          '@mfe-lib/styleguide',
         ],
       },
     },
