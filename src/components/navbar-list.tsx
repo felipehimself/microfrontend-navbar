@@ -1,11 +1,16 @@
-import { Inbox, List, Mail } from '@mui/icons-material'
-import { ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material'
-import { TNavbarOpenProps } from 'src/types'
+import { Inbox, List, Mail } from '@mui/icons-material';
+import {
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+} from '@mui/material';
+import { TNavbarOpenProps } from 'src/types';
 
 export const NavbarList = (props: TNavbarOpenProps) => {
   return (
-    <List >
-      {['App 1', 'App 2', 'App 3',].map((text, index) => (
+    <List>
+      {['App 1', 'App 2', 'App 3'].map((text, index) => (
         <ListItem key={text} disablePadding sx={{ display: 'block' }}>
           <ListItemButton
             sx={{
@@ -28,5 +33,5 @@ export const NavbarList = (props: TNavbarOpenProps) => {
         </ListItem>
       ))}
     </List>
-  )
-}
+  );
+};

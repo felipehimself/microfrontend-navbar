@@ -1,6 +1,9 @@
-import { MicrofrontendTheme } from "@mfe-lib/styleguide";
-import { Inbox, Mail } from "@mui/icons-material";
+import { MicrofrontendTheme } from '@mfe-lib/styleguide';
+import { ExpandLess, ExpandMore, Inbox, Mail } from '@mui/icons-material';
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   Divider,
   List,
   ListItem,
@@ -8,12 +11,15 @@ import {
   ListItemIcon,
   ListItemText,
   Drawer as MuiDrawer,
-  ThemeProvider
+  ThemeProvider,
+  Typography,
 } from '@mui/material';
 import { CSSObject, Theme, styled } from '@mui/material/styles';
-import { useState } from 'react';
-import { NavbarFooter } from "./navbar-footer";
-import { NavBarHeader } from "./navbar-header";
+import { useMemo, useState } from 'react';
+import { NavbarFooter } from './navbar-footer';
+import { NavBarHeader } from './navbar-header';
+import { useNavbarStore } from '@/store/navbar-store';
+import { NavbarSubmenuList } from './navbar-submenu-list';
 const drawerWidth = 220;
 
 const openedMixin = (theme: Theme): CSSObject => ({
@@ -37,92 +43,145 @@ const closedMixin = (theme: Theme): CSSObject => ({
   },
 });
 
-
-const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(
-  ({ theme, open }) => ({
-    width: drawerWidth,
-    flexShrink: 0,
-    whiteSpace: 'nowrap',
-    boxSizing: 'border-box',
-    ...(open && {
-      ...openedMixin(theme),
-      '& .MuiDrawer-paper': openedMixin(theme),
-    }),
-    ...(!open && {
-      ...closedMixin(theme),
-      '& .MuiDrawer-paper': closedMixin(theme),
-    }),
+const Drawer = styled(MuiDrawer, {
+  shouldForwardProp: (prop) => prop !== 'open',
+})(({ theme, open }) => ({
+  width: drawerWidth,
+  flexShrink: 0,
+  whiteSpace: 'nowrap',
+  boxSizing: 'border-box',
+  ...(open && {
+    ...openedMixin(theme),
+    '& .MuiDrawer-paper': openedMixin(theme),
   }),
-);
+  ...(!open && {
+    ...closedMixin(theme),
+    '& .MuiDrawer-paper': closedMixin(theme),
+  }),
+}));
 
-// const menuItems = [
-//   {
-//     label: 'Dashboard',
-//     icon: <Home />, // Replace with your desired icon component
-//     submenu: [], // Can be empty if no submenu
-//   },
-//   {
-//     label: 'Settings',
-//     icon: <Settings />,
-//     submenu: [
-//       { label: 'Profile', link: '/profile' },
-//       { label: 'Notifications', link: '/notifications' },
-//     ],
-//   },
-// ];
+type TMenuChildren = {
+  submenuName: string;
+  path: string;
+};
 
+type TRoutes = {
+  menuName: string;
+  menuChildren: TMenuChildren[];
+};
 
+export type AppRoutes = {
+  appName: string;
+  appIcon?: string;
+  routes: TRoutes[];
+};
+
+const navbarChannel = new BroadcastChannel('navbarChannel');
 
 export const Navbar = () => {
+  const { routes, selectedApp, open, setRoutes, setSelectedApp, setOpen } =
+    useNavbarStore();
 
-  const [open, setOpen] = useState(true);
+  navbarChannel.onmessage = (e) => {
+    const mfeRoutes = e.data as AppRoutes[];
+    setRoutes(mfeRoutes);
+    navbarChannel.close();
+  };
 
-  const handleOpenDrawer = () => setOpen(true)
-  const handleCloseDrawer = () => setOpen(false)
-  const handleDrawerToggle = () => setOpen(!open)
+  const handleOpenDrawer = () => setOpen(true);
+  const handleCloseDrawer = () => setOpen(false);
+
+  const appRoutes = useMemo(() => {
+    return selectedApp == ''
+      ? routes
+      : routes.filter((route) => route.appName === selectedApp);
+  }, [selectedApp, routes]);
 
   return (
     <ThemeProvider theme={MicrofrontendTheme}>
-
       <Drawer
-        onMouseOut={handleCloseDrawer}
-        onMouseOver={handleOpenDrawer}
+        onMouseLeave={handleCloseDrawer}
+        onMouseEnter={handleOpenDrawer}
         variant="permanent"
         open={open}
       >
-
         <NavBarHeader open={open} />
         <Divider />
-        <List >
-
-
-          {['App 1', 'App 2', 'App 3',].map((text, index) => (
-            <ListItem key={text} disablePadding sx={{ display: 'block' }}>
-              <ListItemButton
-                sx={{
-                  minHeight: 48,
-                  justifyContent: open ? 'initial' : 'center',
-                  px: 2.5,
-                }}
-              >
-                <ListItemIcon
+        <List>
+          {appRoutes.map(({ appName, routes, appIcon }) => (
+            <ListItem key={appName} disablePadding sx={{ display: 'block' }}>
+              {selectedApp !== '' && selectedApp === appName ? null : (
+                <ListItemButton
+                  onClick={() => setSelectedApp(appName)}
                   sx={{
-                    minWidth: 0,
-                    mr: open ? 3 : 'auto',
-                    justifyContent: 'center',
+                    minHeight: 48,
+                    justifyContent: open ? 'initial' : 'center',
+                    px: 2.5,
                   }}
                 >
-                  {index % 2 === 0 ? <Inbox /> : <Mail />}
-                </ListItemIcon>
-                <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
-              </ListItemButton>
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 0,
+                      mr: open ? 3 : 'auto',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Inbox />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={appName}
+                    sx={{ opacity: open ? 1 : 0 }}
+                  />
+                </ListItemButton>
+              )}
+              {/* FIXME: essa verificação faz com que o item suma da tela, open se não está open, nao mostra o accordion */}
+              {open && selectedApp === appName && (
+                <Accordion>
+                  <AccordionSummary
+                    expandIcon={<ExpandMore />}
+                    aria-controls="panel1-content"
+                    id="panel1-header"
+                  >
+                    <Inbox /> <Typography>{appName}</Typography>
+                  </AccordionSummary>
+                  {routes.map(({ menuChildren }) => {
+                    return (
+                      <>
+                        {menuChildren.map(({ submenuName, path }) => {
+                          return (
+                            <List>
+                              <ListItem
+                                key={submenuName}
+                                disablePadding
+                                sx={{ display: 'block' }}
+                              >
+                                <ListItemButton
+                                  sx={{
+                                    minHeight: 48,
+                                    justifyContent: open ? 'initial' : 'center',
+                                    px: 2.5,
+                                  }}
+                                >
+                                  <ListItemText
+                                    primary={submenuName + '+'}
+                                    sx={{ opacity: open ? 1 : 0 }}
+                                  />
+                                </ListItemButton>
+                              </ListItem>
+                            </List>
+                          );
+                        })}
+                      </>
+                    );
+                  })}
+                </Accordion>
+              )}
             </ListItem>
           ))}
         </List>
 
-        <NavbarFooter handleDrawerToggle={handleDrawerToggle} open={open} />
+        <NavbarFooter />
       </Drawer>
-
     </ThemeProvider>
   );
-}
+};

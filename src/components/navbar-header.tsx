@@ -1,5 +1,5 @@
-import { Avatar, Box, styled } from "@mui/material";
-import { TNavbarOpenProps } from "src/types";
+import { Avatar, Box, styled } from '@mui/material';
+import { TNavbarOpenProps } from 'src/types';
 const DrawerHeader = styled('div')(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
@@ -9,14 +9,16 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   ...theme.mixins.toolbar,
 }));
 
-
-
 export const NavBarHeader = (props: TNavbarOpenProps) => {
   return (
     <DrawerHeader sx={{ display: 'flex', justifyContent: 'center' }}>
       <Box sx={{ p: 3 }}>
-        <Avatar sx={{ width: props.open ? 56 : 34, height: props.open ? 56 : 34 }} alt="Remy Sharp" src="https://xsgames.co/randomusers/assets/avatars/male/2.jpg" />
+        <Avatar
+          sx={{ width: props.open ? 56 : 34, height: props.open ? 56 : 34 }}
+          alt="Remy Sharp"
+          src="https://randomuser.me/api/portraits/men/21.jpg"
+        />
       </Box>
     </DrawerHeader>
-  )
-}
+  );
+};

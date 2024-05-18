@@ -4,7 +4,6 @@ import * as React from 'react';
 import { TNavbarOpenProps } from 'src/types';
 const drawerWidth = 220;
 
-
 const openedMixin = (theme: Theme): CSSObject => ({
   width: drawerWidth,
   transition: theme.transitions.create('width', {
@@ -26,30 +25,29 @@ const closedMixin = (theme: Theme): CSSObject => ({
   },
 });
 
-
-const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(
-  ({ theme, open }) => ({
-    width: drawerWidth,
-    flexShrink: 0,
-    whiteSpace: 'nowrap',
-    boxSizing: 'border-box',
-    ...(open && {
-      ...openedMixin(theme),
-      '& .MuiDrawer-paper': openedMixin(theme),
-    }),
-    ...(!open && {
-      ...closedMixin(theme),
-      '& .MuiDrawer-paper': closedMixin(theme),
-    }),
+const Drawer = styled(MuiDrawer, {
+  shouldForwardProp: (prop) => prop !== 'open',
+})(({ theme, open }) => ({
+  width: drawerWidth,
+  flexShrink: 0,
+  whiteSpace: 'nowrap',
+  boxSizing: 'border-box',
+  ...(open && {
+    ...openedMixin(theme),
+    '& .MuiDrawer-paper': openedMixin(theme),
   }),
-);
+  ...(!open && {
+    ...closedMixin(theme),
+    '& .MuiDrawer-paper': closedMixin(theme),
+  }),
+}));
 
 type TNavbarProps = React.PropsWithChildren & TNavbarOpenProps;
 
-
 export const Navbar = (props: TNavbarProps) => {
-
   return (
-    <Drawer variant="permanent" open={props.open}>{props.children}</Drawer>
-  )
-}
+    <Drawer variant="permanent" open={props.open}>
+      {props.children}
+    </Drawer>
+  );
+};

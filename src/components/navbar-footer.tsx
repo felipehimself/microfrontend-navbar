@@ -1,24 +1,28 @@
-import { Logout } from "@mui/icons-material";
-import { Button, IconButton, Stack } from "@mui/material";
-import { TNavbarOpenProps } from "src/types";
+import { useNavbarStore } from '@/store/navbar-store';
+import { Logout, ArrowBack } from '@mui/icons-material';
+import { Button, IconButton, Stack } from '@mui/material';
 
+export const NavbarFooter = () => {
+  const { open, selectedApp, setSelectedApp } = useNavbarStore();
 
-type TNavbarFooterProps = TNavbarOpenProps & {
-  handleDrawerToggle: () => void;
-}
-
-export const NavbarFooter = (props: TNavbarFooterProps) => {
   return (
-    <Stack sx={{ mt: 'auto', mb: 5 }} alignItems='center' spacing={2}>
-      {/* <IconButton size={props.open ? 'medium' : 'small'} onClick={props.handleDrawerToggle}>
-        {props.open ? <ChevronLeft fontSize={props.open ? 'medium' : 'small'} /> : <ChevronRight fontSize={props.open ? 'medium' : 'small'} />}
-      </IconButton> */}
+    <Stack sx={{ mt: 'auto', mb: 5 }} alignItems="center" spacing={2}>
+      <IconButton
+        size={open ? 'medium' : 'small'}
+        onClick={() => setSelectedApp('')}
+      >
+        {open && selectedApp && <ArrowBack />}
+      </IconButton>
 
-      {props.open ?
-        <Button variant='contained' color='error' size='small'>sign out</Button> :
-        <IconButton size='small' aria-label="sign out">
-          <Logout color='error' />
-        </IconButton>}
+      {open ? (
+        <Button variant="contained" color="error" size="small">
+          sign out
+        </Button>
+      ) : (
+        <IconButton size="small" aria-label="sign out">
+          <Logout color="error" />
+        </IconButton>
+      )}
     </Stack>
-  )
-}
+  );
+};
