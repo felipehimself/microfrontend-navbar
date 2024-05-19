@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { FluentProvider } from '@fluentui/react-components';
 
 import {
   NavDrawer,
@@ -8,10 +7,7 @@ import {
   NavDrawerHeader,
   NavDrawerHeaderNav,
 } from '@fluentui/react-nav-preview';
-import { Button, useId } from '@fluentui/react-components';
-import { useNavigate } from 'react-router-dom';
-import { BrowserRouter } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import { Button } from '@fluentui/react-components';
 import {
   HealthPlans,
   TrainingPrograms,
@@ -30,11 +26,18 @@ import {
   NavigationFilled,
 } from '@/icons';
 
-import { NavItem } from './elements/nav-item';
+import { NavItem } from './nav/nav-item';
 import { NavSubmenu } from './elements/nav-submenu';
-import { darkTheme, lightTheme } from '@mfe-lib/styleguide';
 import { useStyles } from '@/utils';
 import { TAppRoutes } from '@/types';
+import { Skeleton } from './elements/skeleton';
+import { NavItem as NavItemMock } from '@fluentui/react-nav-preview';
+
+const navIcons = [
+  { appIcon: 'Announcements', icon: <Announcements /> },
+  { appIcon: 'JobPostings', icon: <JobPostings /> },
+  { appIcon: 'Dashboard', icon: <Dashboard /> },
+];
 
 const navbarChannel = new BroadcastChannel('navbarChannel');
 
@@ -42,44 +45,92 @@ const navbarChannel = new BroadcastChannel('navbarChannel');
 export const Navbar = () => {
   const [openNav, setOpenNav] = React.useState(true);
   const [appRoutes, setAppRoutes] = React.useState<TAppRoutes[]>([]);
-  const [isLoadinsRoutes, setIsLoadinsdRoutes] = React.useState(false);
+  const [isLoadinsRoutes, setIsLoadinsdRoutes] = React.useState(true);
+  const [currentApp, setCurrentApp] = React.useState('');
 
   navbarChannel.onmessage = (e) => {
     const mfeRoutes = e.data as TAppRoutes[];
-    setAppRoutes(mfeRoutes);
+    const sorted = mfeRoutes.sort((a, b) => a.appName.localeCompare(b.appName));
+    setAppRoutes(sorted);
+    setIsLoadinsdRoutes(false);
     navbarChannel.close();
   };
 
   const styles = useStyles();
 
-  const applyHoverEffect = React.useMemo(() => {
+  const disableHoverEffect = React.useMemo(() => {
     return openNav ? undefined : styles.noHover;
   }, [openNav]);
 
+  const handleNavClick = (appName: string) => {
+    setCurrentApp(appName);
+    setOpenNav(true);
+  };
+
   return (
-    <FluentProvider theme={lightTheme}>
-      <BrowserRouter>
-        <div className={openNav ? styles.root : styles.rootSm}>
-          <NavDrawer
-            defaultSelectedValue="2"
-            defaultSelectedCategoryValue="1"
-            open
-            type="inline"
-            // onOpenChange={(_, { open }) => setIsOpen(open)}
-            size="small"
-          >
-            <NavDrawerHeader>
-              <NavDrawerHeaderNav>
-                <Button
-                  onClick={() => setOpenNav(!openNav)}
-                  appearance="transparent"
-                  icon={<NavigationFilled />}
-                  className={styles.hamburger}
+    <div className={openNav ? styles.root : styles.rootSm}>
+      <NavDrawer
+        defaultSelectedValue="2"
+        defaultSelectedCategoryValue="1"
+        open
+        type="inline"
+        // onOpenChange={(_, { open }) => setIsOpen(open)}
+        size="small"
+      >
+        <NavDrawerHeader>
+          <NavDrawerHeaderNav>
+            <Button
+              onClick={() => setOpenNav(!openNav)}
+              appearance="transparent"
+              icon={<NavigationFilled />}
+              className={styles.hamburger}
+            />
+          </NavDrawerHeaderNav>
+        </NavDrawerHeader>
+        <NavDrawerBody style={{ overflowX: 'hidden' }}>
+          {isLoadinsRoutes ? (
+            <Skeleton />
+          ) : (
+            appRoutes.map((item, index) => {
+              const Icon = navIcons.find(
+                (navIcon) => navIcon.appIcon === item.appIcon
+              )?.icon;
+
+              return (
+                <NavItem
+                  appName={item.appName}
+                  onClick={() => handleNavClick(item.appName)}
+                  icon={Icon}
+                  routes={item.routes}
+                  open={openNav}
+                  path={item.path}
+                  value={index}
+                  currentApp={currentApp}
+                  className={disableHoverEffect}
                 />
-              </NavDrawerHeaderNav>
-            </NavDrawerHeader>
-            <NavDrawerBody style={{ overflowX: 'hidden' }}>
-              {appRoutes?.map(({ appName, routes, appIcon }, index) => {
+              );
+            })
+          )}
+
+          {/* {!isLoadinsRoutes &&
+                appRoutes.map((item, index) => {
+                  const Icon = navIcons.find(
+                    (navIcon) => navIcon.appIcon === item.appIcon
+                  )?.icon;
+
+                  return (
+                    <NavItem
+                      appName={item.appName}
+                      icon={Icon}
+                      routes={item.routes}
+                      open={openNav}
+                      path={item.path}
+                      value={index}
+                    />
+                  );
+                })} */}
+
+          {/* {appRoutes?.map(({ appName, routes, appIcon }, index) => {
                 const childrenLength = routes.length;
 
                 return childrenLength == 1 ? (
@@ -102,9 +153,9 @@ export const Navbar = () => {
                     routes={routes}
                   />
                 );
-              })}
+              })} */}
 
-              {/* <NavItem
+          {/* <NavItem
                 target="_blank"
                 icon={<Dashboard />}
                 onClick={() => {}}
@@ -115,7 +166,7 @@ export const Navbar = () => {
                 to="announcements"
               /> */}
 
-              {/* <NavSubmenu
+          {/* <NavSubmenu
                 icon={<JobPostings />}
                 onClick={() => setOpenNav(true)}
                 open={openNav}
@@ -124,7 +175,7 @@ export const Navbar = () => {
                 className={applyHoverEffect}
               /> */}
 
-              {/* <NavItem
+          {/* <NavItem
                 target="_blank"
                 icon={<Announcements />}
                 onClick={() => {}}
@@ -133,7 +184,7 @@ export const Navbar = () => {
                 className={applyHoverEffect}
                 open={openNav}
               /> */}
-              {/* <NavSubmenu
+          {/* <NavSubmenu
                 icon={<JobPostings />}
                 onClick={() => setOpenNav(true)}
                 open={openNav}
@@ -141,8 +192,8 @@ export const Navbar = () => {
                 value={(Math.random() + 1).toString(36).substring(7)}
                 className={applyHoverEffect}
               /> */}
-              {/* Static only for the sake of simplicity... */}
-              {/* <NavItem
+          {/* Static only for the sake of simplicity... */}
+          {/* <NavItem
                 target="_blank"
                 icon={<EmployeeSpotlight />}
                 onClick={() => {}}
@@ -226,9 +277,26 @@ export const Navbar = () => {
                 className={applyHoverEffect}
                 open={openNav}
               /> */}
-            </NavDrawerBody>
-            <NavDrawerFooter style={{ overflowX: 'hidden' }}>
-              {/* <NavItem
+        </NavDrawerBody>
+        <NavDrawerFooter style={{ overflowX: 'hidden' }}>
+          {/* <NavItemMock
+            value="21"
+
+            onClick={someClickHandler}
+            icon={<Person />}
+          >
+            Profile
+          </NavItemMock>
+          <NavItemMock
+            icon={<Settings />}
+  
+            onClick={someClickHandler}
+            value="24"
+          >
+            App Settings
+          </NavItemMock> */}
+
+          {/* <NavItem
                 value="21"
                 target="_blank"
                 onClick={() => {}}
@@ -246,10 +314,8 @@ export const Navbar = () => {
                 className={applyHoverEffect}
                 open={openNav}
               /> */}
-            </NavDrawerFooter>
-          </NavDrawer>
-        </div>
-      </BrowserRouter>
-    </FluentProvider>
+        </NavDrawerFooter>
+      </NavDrawer>
+    </div>
   );
 };

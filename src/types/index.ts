@@ -3,12 +3,13 @@ export type TNavbarOpenProps = {
 };
 
 export type TRoutes = {
-  submenuName?: string;
-  path?: string;
+  submenuName: string;
+  path: string;
 };
 
 export type TAppRoutes = {
   appName: string;
-  appIcon?: string;
+  path: string;
+  appIcon: string;
   routes: TRoutes[];
 };

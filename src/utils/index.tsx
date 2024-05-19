@@ -1,5 +1,13 @@
 import { makeStyles, shorthands, tokens } from '@fluentui/react-components';
 
+export const useSkeletonStyles = makeStyles({
+  root: {
+    '> *': {
+      margin: tokens.spacingVerticalM,
+    },
+  },
+});
+
 const baseRoot = {
   display: 'flex',
   height: '100vh',
