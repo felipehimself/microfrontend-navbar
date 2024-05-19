@@ -27,7 +27,6 @@ import {
 } from '@/icons';
 
 import { NavItem } from './nav/nav-item';
-import { NavSubmenu } from './elements/nav-submenu';
 import { useStyles } from '@/utils';
 import { TAppRoutes } from '@/types';
 import { Skeleton } from './elements/skeleton';
