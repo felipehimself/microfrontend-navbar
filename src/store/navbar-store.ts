@@ -1,11 +1,11 @@
-import { AppRoutes } from '@/types';
+import { TAppRoutes } from '@/types';
 import { create } from 'zustand';
 
 type Store = {
-  routes: AppRoutes[];
+  routes: TAppRoutes[];
   selectedApp: string;
   open: boolean;
-  setRoutes: (routes: AppRoutes[]) => void;
+  setRoutes: (routes: TAppRoutes[]) => void;
   setSelectedApp: (selectedApp: string) => void;
   setOpen: (open: boolean) => void;
 };
@@ -14,7 +14,7 @@ export const useNavbarStore = create<Store>()((set) => ({
   routes: [],
   selectedApp: '',
   open: true,
-  setRoutes: (routes: AppRoutes[]) => set({ routes }),
+  setRoutes: (routes: TAppRoutes[]) => set({ routes }),
   setSelectedApp: (selectedApp: string) => set({ selectedApp }),
   setOpen: (open: boolean) => set({ open }),
 }));

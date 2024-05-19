@@ -2,17 +2,12 @@ export type TNavbarOpenProps = {
   open: boolean;
 };
 
-type TMenuChildren = {
-  submenuName: string;
-  path: string;
+export type TRoutes = {
+  submenuName?: string;
+  path?: string;
 };
 
-type TRoutes = {
-  menuName: string;
-  menuChildren: TMenuChildren[];
-};
-
-export type AppRoutes = {
+export type TAppRoutes = {
   appName: string;
   appIcon?: string;
   routes: TRoutes[];

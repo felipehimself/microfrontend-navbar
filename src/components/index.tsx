@@ -1,187 +1,255 @@
-import { MicrofrontendTheme } from '@mfe-lib/styleguide';
-import { ExpandLess, ExpandMore, Inbox, Mail } from '@mui/icons-material';
+import * as React from 'react';
+import { FluentProvider } from '@fluentui/react-components';
+
 import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  Divider,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Drawer as MuiDrawer,
-  ThemeProvider,
-  Typography,
-} from '@mui/material';
-import { CSSObject, Theme, styled } from '@mui/material/styles';
-import { useMemo, useState } from 'react';
-import { NavbarFooter } from './navbar-footer';
-import { NavBarHeader } from './navbar-header';
-import { useNavbarStore } from '@/store/navbar-store';
-import { NavbarSubmenuList } from './navbar-submenu-list';
-const drawerWidth = 220;
+  NavDrawer,
+  NavDrawerBody,
+  NavDrawerFooter,
+  NavDrawerHeader,
+  NavDrawerHeaderNav,
+} from '@fluentui/react-nav-preview';
+import { Button, useId } from '@fluentui/react-components';
+import { useNavigate } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import {
+  HealthPlans,
+  TrainingPrograms,
+  CareerDevelopment,
+  Analytics,
+  Reports,
+  Settings,
+  Announcements,
+  Dashboard,
+  EmployeeSpotlight,
+  Interviews,
+  JobPostings,
+  Person,
+  Search,
+  PerformanceReviews,
+  NavigationFilled,
+} from '@/icons';
 
-const openedMixin = (theme: Theme): CSSObject => ({
-  width: drawerWidth,
-  transition: theme.transitions.create('width', {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.enteringScreen,
-  }),
-  overflowX: 'hidden',
-});
-
-const closedMixin = (theme: Theme): CSSObject => ({
-  transition: theme.transitions.create('width', {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen,
-  }),
-  overflowX: 'hidden',
-  width: `calc(${theme.spacing(7)} + 1px)`,
-  [theme.breakpoints.up('sm')]: {
-    width: `calc(${theme.spacing(8)} + 1px)`,
-  },
-});
-
-const Drawer = styled(MuiDrawer, {
-  shouldForwardProp: (prop) => prop !== 'open',
-})(({ theme, open }) => ({
-  width: drawerWidth,
-  flexShrink: 0,
-  whiteSpace: 'nowrap',
-  boxSizing: 'border-box',
-  ...(open && {
-    ...openedMixin(theme),
-    '& .MuiDrawer-paper': openedMixin(theme),
-  }),
-  ...(!open && {
-    ...closedMixin(theme),
-    '& .MuiDrawer-paper': closedMixin(theme),
-  }),
-}));
-
-type TMenuChildren = {
-  submenuName: string;
-  path: string;
-};
-
-type TRoutes = {
-  menuName: string;
-  menuChildren: TMenuChildren[];
-};
-
-export type AppRoutes = {
-  appName: string;
-  appIcon?: string;
-  routes: TRoutes[];
-};
+import { NavItem } from './elements/nav-item';
+import { NavSubmenu } from './elements/nav-submenu';
+import { darkTheme, lightTheme } from '@mfe-lib/styleguide';
+import { useStyles } from '@/utils';
+import { TAppRoutes } from '@/types';
 
 const navbarChannel = new BroadcastChannel('navbarChannel');
 
+// anything as custom props in the mfe-root can be received as props here
 export const Navbar = () => {
-  const { routes, selectedApp, open, setRoutes, setSelectedApp, setOpen } =
-    useNavbarStore();
+  const [openNav, setOpenNav] = React.useState(true);
+  const [appRoutes, setAppRoutes] = React.useState<TAppRoutes[]>([]);
+  const [isLoadinsRoutes, setIsLoadinsdRoutes] = React.useState(false);
 
   navbarChannel.onmessage = (e) => {
-    const mfeRoutes = e.data as AppRoutes[];
-    setRoutes(mfeRoutes);
+    const mfeRoutes = e.data as TAppRoutes[];
+    setAppRoutes(mfeRoutes);
     navbarChannel.close();
   };
 
-  const handleOpenDrawer = () => setOpen(true);
-  const handleCloseDrawer = () => setOpen(false);
+  const styles = useStyles();
 
-  const appRoutes = useMemo(() => {
-    return selectedApp == ''
-      ? routes
-      : routes.filter((route) => route.appName === selectedApp);
-  }, [selectedApp, routes]);
+  const applyHoverEffect = React.useMemo(() => {
+    return openNav ? undefined : styles.noHover;
+  }, [openNav]);
 
   return (
-    <ThemeProvider theme={MicrofrontendTheme}>
-      <Drawer
-        onMouseLeave={handleCloseDrawer}
-        onMouseEnter={handleOpenDrawer}
-        variant="permanent"
-        open={open}
-      >
-        <NavBarHeader open={open} />
-        <Divider />
-        <List>
-          {appRoutes.map(({ appName, routes, appIcon }) => (
-            <ListItem key={appName} disablePadding sx={{ display: 'block' }}>
-              {selectedApp !== '' && selectedApp === appName ? null : (
-                <ListItemButton
-                  onClick={() => setSelectedApp(appName)}
-                  sx={{
-                    minHeight: 48,
-                    justifyContent: open ? 'initial' : 'center',
-                    px: 2.5,
-                  }}
-                >
-                  <ListItemIcon
-                    sx={{
-                      minWidth: 0,
-                      mr: open ? 3 : 'auto',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    <Inbox />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={appName}
-                    sx={{ opacity: open ? 1 : 0 }}
-                  />
-                </ListItemButton>
-              )}
-              {/* FIXME: essa verificação faz com que o item suma da tela, open se não está open, nao mostra o accordion */}
-              {open && selectedApp === appName && (
-                <Accordion>
-                  <AccordionSummary
-                    expandIcon={<ExpandMore />}
-                    aria-controls="panel1-content"
-                    id="panel1-header"
-                  >
-                    <Inbox /> <Typography>{appName}</Typography>
-                  </AccordionSummary>
-                  {routes.map(({ menuChildren }) => {
-                    return (
-                      <>
-                        {menuChildren.map(({ submenuName, path }) => {
-                          return (
-                            <List>
-                              <ListItem
-                                key={submenuName}
-                                disablePadding
-                                sx={{ display: 'block' }}
-                              >
-                                <ListItemButton
-                                  sx={{
-                                    minHeight: 48,
-                                    justifyContent: open ? 'initial' : 'center',
-                                    px: 2.5,
-                                  }}
-                                >
-                                  <ListItemText
-                                    primary={submenuName + '+'}
-                                    sx={{ opacity: open ? 1 : 0 }}
-                                  />
-                                </ListItemButton>
-                              </ListItem>
-                            </List>
-                          );
-                        })}
-                      </>
-                    );
-                  })}
-                </Accordion>
-              )}
-            </ListItem>
-          ))}
-        </List>
+    <FluentProvider theme={lightTheme}>
+      <BrowserRouter>
+        <div className={openNav ? styles.root : styles.rootSm}>
+          <NavDrawer
+            defaultSelectedValue="2"
+            defaultSelectedCategoryValue="1"
+            open
+            type="inline"
+            // onOpenChange={(_, { open }) => setIsOpen(open)}
+            size="small"
+          >
+            <NavDrawerHeader>
+              <NavDrawerHeaderNav>
+                <Button
+                  onClick={() => setOpenNav(!openNav)}
+                  appearance="transparent"
+                  icon={<NavigationFilled />}
+                  className={styles.hamburger}
+                />
+              </NavDrawerHeaderNav>
+            </NavDrawerHeader>
+            <NavDrawerBody style={{ overflowX: 'hidden' }}>
+              {appRoutes?.map(({ appName, routes, appIcon }, index) => {
+                const childrenLength = routes.length;
 
-        <NavbarFooter />
-      </Drawer>
-    </ThemeProvider>
+                return childrenLength == 1 ? (
+                  <NavItem
+                    icon={<Announcements />}
+                    value={useId()}
+                    menuName={appName}
+                    className={applyHoverEffect}
+                    open={openNav}
+                    to={routes[0].path!}
+                  />
+                ) : (
+                  <NavSubmenu
+                    icon={<JobPostings />}
+                    onClick={() => setOpenNav(true)}
+                    open={openNav}
+                    menuName={appName}
+                    value={index}
+                    className={applyHoverEffect}
+                    routes={routes}
+                  />
+                );
+              })}
+
+              {/* <NavItem
+                target="_blank"
+                icon={<Dashboard />}
+                onClick={() => {}}
+                value="2"
+                menuName="Dashboard"
+                className={applyHoverEffect}
+                open={openNav}
+                to="announcements"
+              /> */}
+
+              {/* <NavSubmenu
+                icon={<JobPostings />}
+                onClick={() => setOpenNav(true)}
+                open={openNav}
+                menuName="Job Postings"
+                value={(Math.random() + 1).toString(36).substring(7)}
+                className={applyHoverEffect}
+              /> */}
+
+              {/* <NavItem
+                target="_blank"
+                icon={<Announcements />}
+                onClick={() => {}}
+                value="3"
+                menuName="Announcements"
+                className={applyHoverEffect}
+                open={openNav}
+              /> */}
+              {/* <NavSubmenu
+                icon={<JobPostings />}
+                onClick={() => setOpenNav(true)}
+                open={openNav}
+                menuName="Job Postings"
+                value={(Math.random() + 1).toString(36).substring(7)}
+                className={applyHoverEffect}
+              /> */}
+              {/* Static only for the sake of simplicity... */}
+              {/* <NavItem
+                target="_blank"
+                icon={<EmployeeSpotlight />}
+                onClick={() => {}}
+                value="3"
+                menuName="Employee Spotlight"
+                className={applyHoverEffect}
+                open={openNav}
+              />
+              <NavItem
+                target="_blank"
+                icon={<Search />}
+                onClick={() => {}}
+                value="4"
+                menuName="Profile Search"
+                className={applyHoverEffect}
+                open={openNav}
+              />
+              <NavItem
+                target="_blank"
+                icon={<PerformanceReviews />}
+                onClick={() => {}}
+                value="5"
+                menuName="Performance Reviews"
+                className={applyHoverEffect}
+                open={openNav}
+              />
+              <NavItem
+                target="_blank"
+                icon={<Interviews />}
+                value="9"
+                menuName="Interviews"
+                open={openNav}
+                className={openNav ? undefined : applyHoverEffect}
+              />
+              <NavItem
+                icon={<HealthPlans />}
+                value="10"
+                menuName="Health Plans"
+                open={openNav}
+                className={applyHoverEffect}
+              />
+              <NavSubmenu
+                icon={<Person />}
+                onClick={() => setOpenNav(true)}
+                open={openNav}
+                menuName="Retirement"
+                value={(Math.random() + 1).toString(36).substring(7)}
+                className={applyHoverEffect}
+              />
+              <NavItem
+                target="_blank"
+                menuName="Training"
+                icon={<TrainingPrograms />}
+                value="15"
+                open={openNav}
+                className={applyHoverEffect}
+              />
+              <NavSubmenu
+                icon={<CareerDevelopment />}
+                onClick={() => setOpenNav(true)}
+                open={openNav}
+                menuName="Career Development"
+                value={(Math.random() + 1).toString(36).substring(7)}
+                className={applyHoverEffect}
+              />
+              <NavItem
+                target="_blank"
+                onClick={() => {}}
+                icon={<Analytics />}
+                value="19"
+                menuName="Workforce Data"
+                className={applyHoverEffect}
+                open={openNav}
+              />
+              <NavItem
+                target="_blank"
+                onClick={() => {}}
+                icon={<Reports />}
+                value="20"
+                menuName="Reports"
+                className={applyHoverEffect}
+                open={openNav}
+              /> */}
+            </NavDrawerBody>
+            <NavDrawerFooter style={{ overflowX: 'hidden' }}>
+              {/* <NavItem
+                value="21"
+                target="_blank"
+                onClick={() => {}}
+                icon={<Person />}
+                menuName="Profile"
+                className={applyHoverEffect}
+                open={openNav}
+              />
+              <NavItem
+                icon={<Settings />}
+                target="_blank"
+                onClick={() => {}}
+                value="24"
+                menuName="Settings"
+                className={applyHoverEffect}
+                open={openNav}
+              /> */}
+            </NavDrawerFooter>
+          </NavDrawer>
+        </div>
+      </BrowserRouter>
+    </FluentProvider>
   );
 };

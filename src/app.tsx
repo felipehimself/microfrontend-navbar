@@ -1,5 +1,7 @@
-import { Navbar } from "./components"
+import { Navbar } from './components';
+import { AppProvider } from './providers';
+const App = () => {
+  return <Navbar />;
+};
 
-const App = () => <Navbar />
-
-export default App
+export default App;

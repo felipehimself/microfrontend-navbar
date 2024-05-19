@@ -2,6 +2,7 @@
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
+import viteTsConfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig(({ mode }) => {
   return {
@@ -13,11 +14,17 @@ export default defineConfig(({ mode }) => {
     },
 
     preview: {
-      port: 4300,
+      port: 4304,
       host: 'localhost',
     },
 
-    plugins: [react(), nxViteTsPaths()],
+    plugins: [
+      react(),
+      nxViteTsPaths(),
+      viteTsConfigPaths({
+        root: './',
+      }),
+    ],
 
     // Uncomment this if you are using workers.
     // worker: {
@@ -67,10 +74,9 @@ export default defineConfig(({ mode }) => {
         external: [
           'react',
           'react-dom',
-          '@mui/material',
           '@emotion/react',
           '@emotion/styled',
-          '@mfe-lib/styleguide',
+          // '@mfe-lib/styleguide',
         ],
       },
     },
