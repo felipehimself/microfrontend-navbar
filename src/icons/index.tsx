@@ -27,11 +27,15 @@ import {
   PreviewLink20Regular,
   Settings20Filled,
   Settings20Regular,
+  SignOut20Filled,
+  SignOut20Regular,
   bundleIcon,
 } from '@fluentui/react-icons';
 
 export { NavigationFilled } from '@fluentui/react-icons';
 export const Person = bundleIcon(PersonFilled, PersonRegular);
+
+export const Signout = bundleIcon(SignOut20Filled, SignOut20Regular);
 
 export const Announcements = bundleIcon(
   MegaphoneLoud20Filled,

@@ -1,4 +1,9 @@
-import { makeStyles, shorthands, tokens } from '@fluentui/react-components';
+import {
+  makeStyles,
+  shorthands,
+  tokens,
+  typographyStyles,
+} from '@fluentui/react-components';
 
 export const useSkeletonStyles = makeStyles({
   root: {
@@ -56,5 +61,31 @@ export const useStyles = makeStyles({
     ':hover': {
       backgroundColor: '#fff',
     },
+  },
+
+  headerContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '0.5rem',
+    marginBottom: '0.6rem',
+  },
+
+  headerAvatar: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '1rem',
+  },
+
+  headerAvatarName: typographyStyles.body2,
+  headerAvatarRole: typographyStyles.caption1,
+
+  center: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  btnFooterPadding: {
+    paddingBottom: '1.5rem',
   },
 });

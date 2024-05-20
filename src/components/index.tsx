@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useState, useMemo } from 'react';
 
 import {
   NavDrawer,
@@ -7,23 +7,18 @@ import {
   NavDrawerHeader,
   NavDrawerHeaderNav,
 } from '@fluentui/react-nav-preview';
-import { Button } from '@fluentui/react-components';
+import { Button, mergeClasses } from '@fluentui/react-components';
 import {
   HealthPlans,
-  TrainingPrograms,
-  CareerDevelopment,
-  Analytics,
-  Reports,
-  Settings,
   Announcements,
   Dashboard,
   EmployeeSpotlight,
   Interviews,
   JobPostings,
-  Person,
   Search,
   PerformanceReviews,
   NavigationFilled,
+  Signout,
 } from '@/icons';
 
 import { NavItem } from './nav/nav-item';
@@ -31,6 +26,7 @@ import { useStyles } from '@/utils';
 import { TAppRoutes } from '@/types';
 import { Skeleton } from './elements/skeleton';
 import { NavItem as NavItemMock } from '@fluentui/react-nav-preview';
+import { Avatar } from './elements/avatar';
 
 const navIcons = [
   { appIcon: 'Announcements', icon: <Announcements /> },
@@ -42,10 +38,10 @@ const navbarChannel = new BroadcastChannel('navbarChannel');
 
 // anything as custom props in the mfe-root can be received as props here
 export const Navbar = () => {
-  const [openNav, setOpenNav] = React.useState(true);
-  const [appRoutes, setAppRoutes] = React.useState<TAppRoutes[]>([]);
-  const [isLoadinsRoutes, setIsLoadinsdRoutes] = React.useState(true);
-  const [currentApp, setCurrentApp] = React.useState('');
+  const [openNav, setOpenNav] = useState(true);
+  const [appRoutes, setAppRoutes] = useState<TAppRoutes[]>([]);
+  const [isLoadinsRoutes, setIsLoadinsdRoutes] = useState(true);
+  const [currentApp, setCurrentApp] = useState('');
 
   navbarChannel.onmessage = (e) => {
     const mfeRoutes = e.data as TAppRoutes[];
@@ -57,13 +53,18 @@ export const Navbar = () => {
 
   const styles = useStyles();
 
-  const disableHoverEffect = React.useMemo(() => {
+  const disableHoverEffect = useMemo(() => {
     return openNav ? undefined : styles.noHover;
   }, [openNav]);
 
   const handleNavClick = (appName: string) => {
     setCurrentApp(appName);
     setOpenNav(true);
+  };
+
+  const handleMockClick = () => {
+    setOpenNav(true);
+    window.alert('Just a simple mock menu that could be a micro frontend');
   };
 
   return (
@@ -78,241 +79,110 @@ export const Navbar = () => {
       >
         <NavDrawerHeader>
           <NavDrawerHeaderNav>
-            <Button
-              onClick={() => setOpenNav(!openNav)}
-              appearance="transparent"
-              icon={<NavigationFilled />}
-              className={styles.hamburger}
-            />
+            <div className={styles.headerContainer}>
+              <Button
+                onClick={() => setOpenNav(!openNav)}
+                appearance="transparent"
+                icon={<NavigationFilled />}
+                className={styles.hamburger}
+              />
+              <div className={styles.headerAvatar}>
+                <Avatar
+                  size={openNav ? 48 : 32}
+                  image={{
+                    src: 'https://randomuser.me/api/portraits/men/21.jpg',
+                  }}
+                />
+                {openNav && (
+                  <div>
+                    <p className={styles.headerAvatarName}>John Doe</p>
+                    <p className={styles.headerAvatarRole}>HR Department</p>
+                  </div>
+                )}
+              </div>
+            </div>
           </NavDrawerHeaderNav>
         </NavDrawerHeader>
         <NavDrawerBody style={{ overflowX: 'hidden' }}>
           {isLoadinsRoutes ? (
             <Skeleton />
           ) : (
-            appRoutes.map((item, index) => {
-              const Icon = navIcons.find(
-                (navIcon) => navIcon.appIcon === item.appIcon
-              )?.icon;
+            <>
+              {appRoutes.map((item, index) => {
+                const Icon = navIcons.find(
+                  (navIcon) => navIcon.appIcon === item.appIcon
+                )?.icon;
 
-              return (
-                <NavItem
-                  appName={item.appName}
-                  onClick={() => handleNavClick(item.appName)}
-                  icon={Icon}
-                  routes={item.routes}
-                  open={openNav}
-                  path={item.path}
-                  value={index}
-                  currentApp={currentApp}
-                  className={disableHoverEffect}
-                />
-              );
-            })
-          )}
-
-          {/* {!isLoadinsRoutes &&
-                appRoutes.map((item, index) => {
-                  const Icon = navIcons.find(
-                    (navIcon) => navIcon.appIcon === item.appIcon
-                  )?.icon;
-
-                  return (
-                    <NavItem
-                      appName={item.appName}
-                      icon={Icon}
-                      routes={item.routes}
-                      open={openNav}
-                      path={item.path}
-                      value={index}
-                    />
-                  );
-                })} */}
-
-          {/* {appRoutes?.map(({ appName, routes, appIcon }, index) => {
-                const childrenLength = routes.length;
-
-                return childrenLength == 1 ? (
+                return (
                   <NavItem
-                    icon={<Announcements />}
-                    value={useId()}
-                    menuName={appName}
-                    className={applyHoverEffect}
+                    appName={item.appName}
+                    onClick={() => handleNavClick(item.appName)}
+                    icon={Icon}
+                    routes={item.routes}
                     open={openNav}
-                    to={routes[0].path!}
-                  />
-                ) : (
-                  <NavSubmenu
-                    icon={<JobPostings />}
-                    onClick={() => setOpenNav(true)}
-                    open={openNav}
-                    menuName={appName}
+                    path={item.path}
                     value={index}
-                    className={applyHoverEffect}
-                    routes={routes}
+                    currentApp={currentApp}
+                    className={disableHoverEffect}
                   />
                 );
-              })} */}
+              })}
 
-          {/* <NavItem
-                target="_blank"
-                icon={<Dashboard />}
-                onClick={() => {}}
-                value="2"
-                menuName="Dashboard"
-                className={applyHoverEffect}
-                open={openNav}
-                to="announcements"
-              /> */}
-
-          {/* <NavSubmenu
-                icon={<JobPostings />}
-                onClick={() => setOpenNav(true)}
-                open={openNav}
-                menuName="Job Postings"
-                value={(Math.random() + 1).toString(36).substring(7)}
-                className={applyHoverEffect}
-              /> */}
-
-          {/* <NavItem
-                target="_blank"
-                icon={<Announcements />}
-                onClick={() => {}}
-                value="3"
-                menuName="Announcements"
-                className={applyHoverEffect}
-                open={openNav}
-              /> */}
-          {/* <NavSubmenu
-                icon={<JobPostings />}
-                onClick={() => setOpenNav(true)}
-                open={openNav}
-                menuName="Job Postings"
-                value={(Math.random() + 1).toString(36).substring(7)}
-                className={applyHoverEffect}
-              /> */}
-          {/* Static only for the sake of simplicity... */}
-          {/* <NavItem
-                target="_blank"
+              <NavItemMock
                 icon={<EmployeeSpotlight />}
-                onClick={() => {}}
-                value="3"
-                menuName="Employee Spotlight"
-                className={applyHoverEffect}
-                open={openNav}
-              />
-              <NavItem
-                target="_blank"
+                onClick={handleMockClick}
+                value="12"
+                className={disableHoverEffect}
+              >
+                Employee
+              </NavItemMock>
+
+              <NavItemMock
                 icon={<Search />}
-                onClick={() => {}}
-                value="4"
-                menuName="Profile Search"
-                className={applyHoverEffect}
-                open={openNav}
-              />
-              <NavItem
-                target="_blank"
+                onClick={handleMockClick}
+                value="13"
+                className={disableHoverEffect}
+              >
+                Profile
+              </NavItemMock>
+
+              <NavItemMock
                 icon={<PerformanceReviews />}
-                onClick={() => {}}
-                value="5"
-                menuName="Performance Reviews"
-                className={applyHoverEffect}
-                open={openNav}
-              />
-              <NavItem
-                target="_blank"
-                icon={<Interviews />}
-                value="9"
-                menuName="Interviews"
-                open={openNav}
-                className={openNav ? undefined : applyHoverEffect}
-              />
-              <NavItem
+                onClick={handleMockClick}
+                value="14"
+                className={disableHoverEffect}
+              >
+                Performance
+              </NavItemMock>
+
+              <NavItemMock
+                onClick={handleMockClick}
                 icon={<HealthPlans />}
-                value="10"
-                menuName="Health Plans"
-                open={openNav}
-                className={applyHoverEffect}
-              />
-              <NavSubmenu
-                icon={<Person />}
-                onClick={() => setOpenNav(true)}
-                open={openNav}
-                menuName="Retirement"
-                value={(Math.random() + 1).toString(36).substring(7)}
-                className={applyHoverEffect}
-              />
-              <NavItem
-                target="_blank"
-                menuName="Training"
-                icon={<TrainingPrograms />}
                 value="15"
-                open={openNav}
-                className={applyHoverEffect}
-              />
-              <NavSubmenu
-                icon={<CareerDevelopment />}
-                onClick={() => setOpenNav(true)}
-                open={openNav}
-                menuName="Career Development"
-                value={(Math.random() + 1).toString(36).substring(7)}
-                className={applyHoverEffect}
-              />
-              <NavItem
-                target="_blank"
-                onClick={() => {}}
-                icon={<Analytics />}
-                value="19"
-                menuName="Workforce Data"
-                className={applyHoverEffect}
-                open={openNav}
-              />
-              <NavItem
-                target="_blank"
-                onClick={() => {}}
-                icon={<Reports />}
-                value="20"
-                menuName="Reports"
-                className={applyHoverEffect}
-                open={openNav}
-              /> */}
+                className={disableHoverEffect}
+              >
+                Health
+              </NavItemMock>
+
+              <NavItemMock
+                onClick={handleMockClick}
+                icon={<Interviews />}
+                value="16"
+                className={disableHoverEffect}
+              >
+                Interviews
+              </NavItemMock>
+            </>
+          )}
         </NavDrawerBody>
         <NavDrawerFooter style={{ overflowX: 'hidden' }}>
-          {/* <NavItemMock
-            value="21"
-
-            onClick={someClickHandler}
-            icon={<Person />}
-          >
-            Profile
-          </NavItemMock>
-          <NavItemMock
-            icon={<Settings />}
-  
-            onClick={someClickHandler}
-            value="24"
-          >
-            App Settings
-          </NavItemMock> */}
-
-          {/* <NavItem
-                value="21"
-                target="_blank"
-                onClick={() => {}}
-                icon={<Person />}
-                menuName="Profile"
-                className={applyHoverEffect}
-                open={openNav}
-              />
-              <NavItem
-                icon={<Settings />}
-                target="_blank"
-                onClick={() => {}}
-                value="24"
-                menuName="Settings"
-                className={applyHoverEffect}
-                open={openNav}
-              /> */}
+          <div className={mergeClasses(styles.center, styles.btnFooterPadding)}>
+            {openNav ? (
+              <Button>Sign out</Button>
+            ) : (
+              <Button icon={<Signout fontSize="1rem" />} />
+            )}
+          </div>
         </NavDrawerFooter>
       </NavDrawer>
     </div>
