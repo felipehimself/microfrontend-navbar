@@ -7,7 +7,7 @@ import {
   NavDrawerHeader,
   NavDrawerHeaderNav,
 } from '@fluentui/react-nav-preview';
-import { Button, mergeClasses } from '@fluentui/react-components';
+import { Button, Toaster, mergeClasses } from '@fluentui/react-components';
 import {
   HealthPlans,
   Announcements,
@@ -27,6 +27,7 @@ import { TAppRoutes } from '@/types';
 import { Skeleton } from './elements/skeleton';
 import { NavItem as NavItemMock } from '@fluentui/react-nav-preview';
 import { Avatar } from './elements/avatar';
+import { useToaster } from '@/hooks/useToaster';
 
 const navIcons = [
   { appIcon: 'Announcements', icon: <Announcements /> },
@@ -42,6 +43,8 @@ export const Navbar = () => {
   const [appRoutes, setAppRoutes] = useState<TAppRoutes[]>([]);
   const [isLoadinsRoutes, setIsLoadinsdRoutes] = useState(true);
   const [currentApp, setCurrentApp] = useState('');
+
+  const { notify } = useToaster('navbar-toaster');
 
   navbarChannel.onmessage = (e) => {
     const mfeRoutes = e.data as TAppRoutes[];
@@ -64,7 +67,8 @@ export const Navbar = () => {
 
   const handleMockClick = () => {
     setOpenNav(true);
-    window.alert('Just a simple mock menu that could be a micro frontend');
+    notify();
+    // window.alert('Just a simple mock menu that could be a micro frontend');
   };
 
   return (
@@ -185,6 +189,7 @@ export const Navbar = () => {
           </div>
         </NavDrawerFooter>
       </NavDrawer>
+      <Toaster toasterId="navbar-toaster" />
     </div>
   );
 };
