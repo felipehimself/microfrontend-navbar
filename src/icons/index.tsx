@@ -30,11 +30,15 @@ import {
   SignOut20Filled,
   SignOut20Regular,
   bundleIcon,
+  Home20Filled,
+  Home20Regular,
 } from '@fluentui/react-icons';
 
 export { NavigationFilled } from '@fluentui/react-icons';
 export const Person = bundleIcon(PersonFilled, PersonRegular);
 
+export const Home = Home20Regular;
+export const HomeFilled = Home20Filled;
 export const Signout = bundleIcon(SignOut20Filled, SignOut20Regular);
 
 export const Announcements = bundleIcon(

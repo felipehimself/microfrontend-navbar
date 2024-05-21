@@ -49,6 +49,7 @@ export const useStyles = makeStyles({
   hamburger: {
     color: tokens.colorNeutralForeground2,
     textDecorationLine: 'none',
+    marginRight: '-0.6rem',
   },
 
   noHover: {
@@ -87,5 +88,22 @@ export const useStyles = makeStyles({
 
   btnFooterPadding: {
     paddingBottom: '1.5rem',
+  },
+
+  headerActions: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+
+  homeLink: {
+    display: 'flex',
+    alignItems: 'center',
+  },
+
+  homeIcon: {
+    ':active': {
+      color: '#B878B6',
+    },
   },
 });

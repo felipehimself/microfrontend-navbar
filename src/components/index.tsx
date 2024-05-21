@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-
+import { Link } from 'react-router-dom';
 import {
   NavDrawer,
   NavDrawerBody,
@@ -19,6 +19,8 @@ import {
   PerformanceReviews,
   NavigationFilled,
   Signout,
+  Home,
+  HomeFilled,
 } from '@/icons';
 
 import { NavItem } from './nav/nav-item';
@@ -43,6 +45,7 @@ export const Navbar = () => {
   const [appRoutes, setAppRoutes] = useState<TAppRoutes[]>([]);
   const [isLoadinsRoutes, setIsLoadinsdRoutes] = useState(true);
   const [currentApp, setCurrentApp] = useState('');
+  const [hoverHomeIcon, setHoverHomeIcon] = useState(false);
 
   const { notify } = useToaster('navbar-toaster');
 
@@ -78,18 +81,34 @@ export const Navbar = () => {
         defaultSelectedCategoryValue="1"
         open
         type="inline"
-        // onOpenChange={(_, { open }) => setIsOpen(open)}
         size="small"
       >
         <NavDrawerHeader>
           <NavDrawerHeaderNav>
             <div className={styles.headerContainer}>
-              <Button
-                onClick={() => setOpenNav(!openNav)}
-                appearance="transparent"
-                icon={<NavigationFilled />}
-                className={styles.hamburger}
-              />
+              <div className={styles.headerActions}>
+                {openNav && (
+                  <Link
+                    onMouseEnter={() => setHoverHomeIcon(true)}
+                    onMouseLeave={() => setHoverHomeIcon(false)}
+                    className={styles.homeLink}
+                    to="/"
+                  >
+                    {hoverHomeIcon ? (
+                      <HomeFilled className={styles.homeIcon} />
+                    ) : (
+                      <Home className={styles.homeIcon} />
+                    )}
+                  </Link>
+                )}
+                <Button
+                  onClick={() => setOpenNav(!openNav)}
+                  appearance="transparent"
+                  icon={<NavigationFilled />}
+                  className={styles.hamburger}
+                />
+              </div>
+
               <div className={styles.headerAvatar}>
                 <Avatar
                   size={openNav ? 48 : 32}
