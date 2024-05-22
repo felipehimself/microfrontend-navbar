@@ -16,9 +16,24 @@ export const useSkeletonStyles = makeStyles({
 const baseRoot = {
   display: 'flex',
   height: '100vh',
-  backgroundColor: '#fff',
+  // backgroundColor: '#fff',
+  transition: 'width 0.3s ease',
 };
 export const useStyles = makeStyles({
+  relative: {
+    position: 'relative',
+  },
+
+  transition: {
+    transition: 'width 0.3s ease',
+  },
+
+  changeThemeButton: {
+    position: 'fixed',
+    top: '0.5rem',
+    right: '1rem',
+  },
+
   root: {
     ...baseRoot,
   },
@@ -94,11 +109,6 @@ export const useStyles = makeStyles({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-  },
-
-  homeLink: {
-    display: 'flex',
-    alignItems: 'center',
   },
 
   homeIcon: {

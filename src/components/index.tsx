@@ -19,8 +19,9 @@ import {
   PerformanceReviews,
   NavigationFilled,
   Signout,
-  Home,
-  HomeFilled,
+  Home20Filled,
+  WeatherSunnyFilled,
+  WeatherMoon20Filled,
 } from '@/icons';
 
 import { NavItem } from './nav/nav-item';
@@ -30,6 +31,7 @@ import { Skeleton } from './elements/skeleton';
 import { NavItem as NavItemMock } from '@fluentui/react-nav-preview';
 import { Avatar } from './elements/avatar';
 import { useToaster } from '@/hooks/useToaster';
+import { useThemeStore } from '@/store/theme-store';
 
 const navIcons = [
   { appIcon: 'Announcements', icon: <Announcements /> },
@@ -38,6 +40,7 @@ const navIcons = [
 ];
 
 const navbarChannel = new BroadcastChannel('navbarChannel');
+const themeChannel = new BroadcastChannel('theme');
 
 // anything as custom props in the mfe-root can be received as props here
 export const Navbar = () => {
@@ -45,9 +48,16 @@ export const Navbar = () => {
   const [appRoutes, setAppRoutes] = useState<TAppRoutes[]>([]);
   const [isLoadinsRoutes, setIsLoadinsdRoutes] = useState(true);
   const [currentApp, setCurrentApp] = useState('');
-  const [hoverHomeIcon, setHoverHomeIcon] = useState(false);
 
   const { notify } = useToaster('navbar-toaster');
+
+  const { toggleTheme, theme } = useThemeStore();
+
+  const handleTheme = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    toggleTheme();
+    themeChannel.postMessage(newTheme);
+  };
 
   navbarChannel.onmessage = (e) => {
     const mfeRoutes = e.data as TAppRoutes[];
@@ -71,34 +81,30 @@ export const Navbar = () => {
   const handleMockClick = () => {
     setOpenNav(true);
     notify();
-    // window.alert('Just a simple mock menu that could be a micro frontend');
   };
 
+  const drawerClassName = useMemo(() => {
+    return openNav ? styles.root : styles.rootSm;
+  }, [openNav]);
+
   return (
-    <div className={openNav ? styles.root : styles.rootSm}>
-      <NavDrawer
-        defaultSelectedValue="2"
-        defaultSelectedCategoryValue="1"
-        open
-        type="inline"
-        size="small"
-      >
+    <>
+      <Button
+        onClick={handleTheme}
+        appearance="transparent"
+        className={styles.changeThemeButton}
+        icon={
+          theme === 'light' ? <WeatherMoon20Filled /> : <WeatherSunnyFilled />
+        }
+      />
+      <NavDrawer className={drawerClassName} open type="inline" size="small">
         <NavDrawerHeader>
           <NavDrawerHeaderNav>
             <div className={styles.headerContainer}>
               <div className={styles.headerActions}>
                 {openNav && (
-                  <Link
-                    onMouseEnter={() => setHoverHomeIcon(true)}
-                    onMouseLeave={() => setHoverHomeIcon(false)}
-                    className={styles.homeLink}
-                    to="/"
-                  >
-                    {hoverHomeIcon ? (
-                      <HomeFilled className={styles.homeIcon} />
-                    ) : (
-                      <Home className={styles.homeIcon} />
-                    )}
+                  <Link to="/">
+                    <Button appearance="transparent" icon={<Home20Filled />} />
                   </Link>
                 )}
                 <Button
@@ -118,8 +124,19 @@ export const Navbar = () => {
                 />
                 {openNav && (
                   <div>
-                    <p className={styles.headerAvatarName}>John Doe</p>
-                    <p className={styles.headerAvatarRole}>HR Department</p>
+                    <p
+                      // FIXME: change to className
+                      style={{ whiteSpace: 'nowrap' }}
+                      className={styles.headerAvatarName}
+                    >
+                      John Doe
+                    </p>
+                    <p
+                      style={{ whiteSpace: 'nowrap' }}
+                      className={styles.headerAvatarRole}
+                    >
+                      HR Department
+                    </p>
                   </div>
                 )}
               </div>
@@ -209,6 +226,6 @@ export const Navbar = () => {
         </NavDrawerFooter>
       </NavDrawer>
       <Toaster toasterId="navbar-toaster" />
-    </div>
+    </>
   );
 };
