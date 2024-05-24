@@ -8,7 +8,7 @@ type TThemeStore = {
 };
 
 export const useThemeStore = create<TThemeStore>()((set) => ({
-  theme: 'light',
+  theme: (localStorage.getItem('mfe-theme') as TTheme) ?? 'light',
   toggleTheme: () =>
     set((state) => {
       const newTheme = state.theme === 'light' ? 'dark' : 'light';

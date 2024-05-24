@@ -10,6 +10,14 @@ export const useSkeletonStyles = makeStyles({
     '> *': {
       margin: tokens.spacingVerticalM,
     },
+
+    '> :nth-child(even)': {
+      width: '85% !important',
+    },
+
+    '> :nth-child(odd)': {
+      width: '75% !important',
+    },
   },
 });
 
