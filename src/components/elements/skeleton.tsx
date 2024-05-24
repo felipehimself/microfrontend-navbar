@@ -1,7 +1,7 @@
 import { Skeleton as SK, SkeletonItem } from '@fluentui/react-components';
 import type { SkeletonProps } from '@fluentui/react-components';
 
-import { useSkeletonStyles } from '@/utils';
+import { useSkeletonStyles } from '@/styles';
 
 export const Skeleton = (props: Partial<SkeletonProps>) => {
   const styles = useSkeletonStyles();

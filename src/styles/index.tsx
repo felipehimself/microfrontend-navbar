@@ -16,18 +16,9 @@ export const useSkeletonStyles = makeStyles({
 const baseRoot = {
   display: 'flex',
   height: '100vh',
-  // backgroundColor: '#fff',
   transition: 'width 0.3s ease',
 };
 export const useStyles = makeStyles({
-  relative: {
-    position: 'relative',
-  },
-
-  transition: {
-    transition: 'width 0.3s ease',
-  },
-
   changeThemeButton: {
     position: 'fixed',
     top: '0.5rem',
@@ -90,6 +81,10 @@ export const useStyles = makeStyles({
     display: 'flex',
     alignItems: 'center',
     gap: '1rem',
+  },
+
+  noWrap: {
+    whiteSpace: 'nowrap',
   },
 
   headerAvatarName: typographyStyles.body2,

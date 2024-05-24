@@ -9,14 +9,6 @@ import {
 } from '@fluentui/react-nav-preview';
 import { Button, Toaster, mergeClasses } from '@fluentui/react-components';
 import {
-  HealthPlans,
-  Announcements,
-  Dashboard,
-  EmployeeSpotlight,
-  Interviews,
-  JobPostings,
-  Search,
-  PerformanceReviews,
   NavigationFilled,
   Signout,
   Home20Filled,
@@ -25,22 +17,16 @@ import {
 } from '@/icons';
 
 import { NavItem } from './nav/nav-item';
-import { useStyles } from '@/utils';
+import { useStyles } from '@/styles';
 import { TAppRoutes } from '@/types';
 import { Skeleton } from './elements/skeleton';
 import { NavItem as NavItemMock } from '@fluentui/react-nav-preview';
 import { Avatar } from './elements/avatar';
 import { useToaster } from '@/hooks/useToaster';
 import { useThemeStore } from '@/store/theme-store';
-
-const navIcons = [
-  { appIcon: 'Announcements', icon: <Announcements /> },
-  { appIcon: 'JobPostings', icon: <JobPostings /> },
-  { appIcon: 'Dashboard', icon: <Dashboard /> },
-];
+import { navItemsMock, navItemsIcons } from '@/utils/mock-nav-items';
 
 const navbarChannel = new BroadcastChannel('navbarChannel');
-const themeChannel = new BroadcastChannel('theme');
 
 // anything as custom props in the mfe-root can be received as props here
 export const Navbar = () => {
@@ -56,7 +42,10 @@ export const Navbar = () => {
   const handleTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
     toggleTheme();
-    themeChannel.postMessage(newTheme);
+    localStorage.setItem('mfe-theme', newTheme);
+    dispatchEvent(
+      new CustomEvent('mfe-theme', { detail: { theme: newTheme } })
+    );
   };
 
   navbarChannel.onmessage = (e) => {
@@ -86,6 +75,8 @@ export const Navbar = () => {
   const drawerClassName = useMemo(() => {
     return openNav ? styles.root : styles.rootSm;
   }, [openNav]);
+
+  const navItemClassName = mergeClasses(disableHoverEffect, styles.noWrap);
 
   return (
     <>
@@ -125,18 +116,21 @@ export const Navbar = () => {
                 {openNav && (
                   <div>
                     <p
-                      // FIXME: change to className
-                      style={{ whiteSpace: 'nowrap' }}
-                      className={styles.headerAvatarName}
+                      className={mergeClasses(
+                        styles.headerAvatarName,
+                        styles.noWrap
+                      )}
                     >
                       John Doe
                     </p>
-                    <p
-                      style={{ whiteSpace: 'nowrap' }}
-                      className={styles.headerAvatarRole}
+                    <span
+                      className={mergeClasses(
+                        styles.headerAvatarRole,
+                        styles.noWrap
+                      )}
                     >
                       HR Department
-                    </p>
+                    </span>
                   </div>
                 )}
               </div>
@@ -149,7 +143,7 @@ export const Navbar = () => {
           ) : (
             <>
               {appRoutes.map((item, index) => {
-                const Icon = navIcons.find(
+                const Icon = navItemsIcons.find(
                   (navIcon) => navIcon.appIcon === item.appIcon
                 )?.icon;
 
@@ -163,55 +157,25 @@ export const Navbar = () => {
                     path={item.path}
                     value={index}
                     currentApp={currentApp}
-                    className={disableHoverEffect}
+                    className={navItemClassName}
                   />
                 );
               })}
 
-              <NavItemMock
-                icon={<EmployeeSpotlight />}
-                onClick={handleMockClick}
-                value="12"
-                className={disableHoverEffect}
-              >
-                Employee
-              </NavItemMock>
+              {navItemsMock.map(({ icon, menuName }, index) => {
+                const nextValue = navItemsIcons.length + (index + 1);
 
-              <NavItemMock
-                icon={<Search />}
-                onClick={handleMockClick}
-                value="13"
-                className={disableHoverEffect}
-              >
-                Profile
-              </NavItemMock>
-
-              <NavItemMock
-                icon={<PerformanceReviews />}
-                onClick={handleMockClick}
-                value="14"
-                className={disableHoverEffect}
-              >
-                Performance
-              </NavItemMock>
-
-              <NavItemMock
-                onClick={handleMockClick}
-                icon={<HealthPlans />}
-                value="15"
-                className={disableHoverEffect}
-              >
-                Health
-              </NavItemMock>
-
-              <NavItemMock
-                onClick={handleMockClick}
-                icon={<Interviews />}
-                value="16"
-                className={disableHoverEffect}
-              >
-                Interviews
-              </NavItemMock>
+                return (
+                  <NavItemMock
+                    icon={icon}
+                    onClick={handleMockClick}
+                    value={nextValue}
+                    className={disableHoverEffect}
+                  >
+                    {openNav && menuName}
+                  </NavItemMock>
+                );
+              })}
             </>
           )}
         </NavDrawerBody>
