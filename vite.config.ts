@@ -5,6 +5,18 @@ import { defineConfig } from 'vite';
 import viteTsConfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig(({ mode }) => {
+  console.log('running vite in mode: ', mode);
+
+  const isDev = mode === 'development';
+
+  const hotModuleReplacementConfig = {
+    watch: {
+      chokidar: {
+        usePolling: mode === 'development',
+      },
+    },
+  };
+
   return {
     cacheDir: './node_modules/.vite/microfrontend-navbar',
 
@@ -16,6 +28,9 @@ export default defineConfig(({ mode }) => {
     preview: {
       port: 4304,
       host: 'localhost',
+      chokidarOptions: {
+        usePolling: true,
+      },
     },
 
     plugins: [
@@ -26,23 +41,14 @@ export default defineConfig(({ mode }) => {
       }),
     ],
 
-    // Uncomment this if you are using workers.
-    // worker: {
-    //  plugins: [ nxViteTsPaths() ],
-    // },
-
     build: {
       outDir: './dist',
       emptyOutDir: true,
-      // watch: {
-      //   chokidar: {
-      //     usePolling: mode === 'development',
-      //   },
-      // },
-      // reportCompressedSize: true,
-      // commonjsOptions: {
-      //   transformMixedEsModules: true,
-      // },
+      ...(isDev && hotModuleReplacementConfig),
+      reportCompressedSize: true,
+      commonjsOptions: {
+        transformMixedEsModules: true,
+      },
       sourcemap: true,
       rollupOptions: {
         input: 'src/microfrontend-navbar.tsx',
