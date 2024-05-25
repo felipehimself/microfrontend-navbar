@@ -1,0 +1,73 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  dev-deploy:
+    name: Building Dev image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: DockerHub login
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push dev image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          tags: felipehimself/mfe-navbar:dev
+
+  prod-deploy:
+    name: Building Prod image
+    runs-on: ubuntu-latest
+    needs: dev-deploy
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Request Deployment Approval
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.issues.create({
+              owner: 'felipehimself',
+              repo: context.repo.repo,
+              title: 'Requesting Deployment Approval to Production',
+              body: 'A new build is ready for deployment to production. Please review and approve the deployment.'
+            })
+      - name: Wait for Approval
+        uses: styfle/gorelease@v1
+        with:
+          # Replace with your conditions to check for approval (e.g., label, comment)
+          matches: '^/approve$'
+          label: 'approved-for-deployment'
+
+      - name: Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: DockerHub login
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push prod image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          tags: felipehimself/mfe-navbar:latest
