@@ -34,11 +34,11 @@ export default defineConfig(({ mode }) => {
     build: {
       outDir: './dist',
       emptyOutDir: true,
-      watch: {
-        chokidar: {
-          usePolling: mode === 'development',
-        },
-      },
+      // watch: {
+      //   chokidar: {
+      //     usePolling: mode === 'development',
+      //   },
+      // },
       // reportCompressedSize: true,
       // commonjsOptions: {
       //   transformMixedEsModules: true,
