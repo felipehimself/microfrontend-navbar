@@ -28,7 +28,7 @@ jobs:
           context: .
           file: Dockerfile
           push: true
-          tags: felipehimself/mfe-navbar:latest
+          tags: felipehimself/mfe-navbar:dev
 
   prod-deploy:
     name: Building Prod image
