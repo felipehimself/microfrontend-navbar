@@ -1,12 +1,13 @@
 import {
   Toast,
+  ToastIntent,
   ToastTitle,
   ToastTrigger,
   useToastController,
 } from '@fluentui/react-components';
-import { ToastIntent } from '@fluentui/react-components';
 
 export const useToaster = (toasterId: string, intent: ToastIntent = 'info') => {
+
   const { dispatchToast } = useToastController(toasterId);
 
   const notify = () => {
