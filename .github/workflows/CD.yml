@@ -24,6 +24,7 @@ jobs:
   prod-deploy:
     name: Prod Deployment
     environment: PROD
+    needs: dev-deploy
     runs-on: ubuntu-latest
     
     steps: 
