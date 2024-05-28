@@ -3,10 +3,11 @@ import {
   Dashboard,
   EmployeeSpotlight,
   HealthPlans,
+  Home,
   Interviews,
   JobPostings,
   PerformanceReviews,
-  Search,
+  Search
 } from '@/icons';
 
 export const navItemsMock = [
@@ -33,6 +34,7 @@ export const navItemsMock = [
 ];
 
 export const navItemsIcons = [
+  { appIcon: 'Home', icon: <Home /> },
   { appIcon: 'Announcements', icon: <Announcements /> },
   { appIcon: 'JobPostings', icon: <JobPostings /> },
   { appIcon: 'Dashboard', icon: <Dashboard /> },

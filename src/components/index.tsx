@@ -1,5 +1,9 @@
-import { useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import {
+  Signout,
+  WeatherMoon20Filled,
+  WeatherSunnyFilled
+} from '@/icons';
+import { Button, Toaster, mergeClasses } from '@fluentui/react-components';
 import {
   NavDrawer,
   NavDrawerBody,
@@ -7,24 +11,18 @@ import {
   NavDrawerHeader,
   NavDrawerHeaderNav,
 } from '@fluentui/react-nav-preview';
-import { Button, Toaster, mergeClasses } from '@fluentui/react-components';
-import {
-  NavigationFilled,
-  Signout,
-  Home20Filled,
-  WeatherSunnyFilled,
-  WeatherMoon20Filled,
-} from '@/icons';
+import { useMemo, useState } from 'react';
 
-import { NavItem } from './nav/nav-item';
-import { useStyles } from '@/styles';
-import { TAppRoutes } from '@/types';
-import { Skeleton } from './elements/skeleton';
-import { NavItem as NavItemMock } from '@fluentui/react-nav-preview';
-import { Avatar } from './elements/avatar';
 import { useToaster } from '@/hooks/useToaster';
 import { useThemeStore } from '@/store/theme-store';
-import { navItemsMock, navItemsIcons } from '@/utils/mock-nav-items';
+import { useStyles } from '@/styles';
+import { TAppRoutes } from '@/types';
+import { navItemsIcons, navItemsMock } from '@/utils/mock-nav-items';
+import { sortNavItems } from '@/utils/sort-nav-items';
+import { NavItem as NavItemMock } from '@fluentui/react-nav-preview';
+import { DrawerHeaderContent } from './elements/drawer-header-content';
+import { Skeleton } from './elements/skeleton';
+import { NavItem } from './nav/nav-item';
 
 const navbarChannel = new BroadcastChannel('navbarChannel');
 
@@ -50,7 +48,9 @@ export const Navbar = () => {
 
   navbarChannel.onmessage = (e) => {
     const mfeRoutes = e.data as TAppRoutes[];
-    const sorted = mfeRoutes.sort((a, b) => a.appName.localeCompare(b.appName));
+
+    const sorted = sortNavItems(mfeRoutes);
+
     setAppRoutes(sorted);
     setIsLoadinsdRoutes(false);
     navbarChannel.close();
@@ -60,12 +60,16 @@ export const Navbar = () => {
 
   const disableHoverEffect = useMemo(() => {
     return openNav ? undefined : styles.noHover;
-  }, [openNav]);
+  }, [openNav, styles.noHover]);
 
   const handleNavClick = (appName: string) => {
-    setCurrentApp(appName);
     setOpenNav(true);
+    setCurrentApp(appName);
   };
+
+  const handleSingleRouteClick = () => {
+    !openNav && setOpenNav(true);
+  }
 
   const handleMockClick = () => {
     setOpenNav(true);
@@ -74,7 +78,7 @@ export const Navbar = () => {
 
   const drawerClassName = useMemo(() => {
     return openNav ? styles.root : styles.rootSm;
-  }, [openNav]);
+  }, [openNav, styles.root, styles.rootSm]);
 
   const navItemClassName = mergeClasses(disableHoverEffect, styles.noWrap);
 
@@ -91,53 +95,10 @@ export const Navbar = () => {
       <NavDrawer className={drawerClassName} open type="inline" size="small">
         <NavDrawerHeader>
           <NavDrawerHeaderNav>
-            <div className={styles.headerContainer}>
-              <div className={styles.headerActions}>
-                {openNav && (
-                  <Link to="/">
-                    <Button appearance="transparent" icon={<Home20Filled />} />
-                  </Link>
-                )}
-                <Button
-                  onClick={() => setOpenNav(!openNav)}
-                  appearance="transparent"
-                  icon={<NavigationFilled />}
-                  className={styles.hamburger}
-                />
-              </div>
-
-              <div className={styles.headerAvatar}>
-                <Avatar
-                  size={openNav ? 48 : 32}
-                  image={{
-                    src: 'https://randomuser.me/api/portraits/men/21.jpg',
-                  }}
-                />
-                {openNav && (
-                  <div>
-                    <p
-                      className={mergeClasses(
-                        styles.headerAvatarName,
-                        styles.noWrap
-                      )}
-                    >
-                      John Doe
-                    </p>
-                    <span
-                      className={mergeClasses(
-                        styles.headerAvatarRole,
-                        styles.noWrap
-                      )}
-                    >
-                      HR Department
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
+            <DrawerHeaderContent setOpenNav={() => setOpenNav(!openNav)} openNav={openNav} />
           </NavDrawerHeaderNav>
         </NavDrawerHeader>
-        <NavDrawerBody style={{ overflowX: 'hidden' }}>
+        <NavDrawerBody className={styles.noOverflowX}>
           {isLoadinsRoutes ? (
             <Skeleton />
           ) : (
@@ -158,19 +119,18 @@ export const Navbar = () => {
                     value={index}
                     currentApp={currentApp}
                     className={navItemClassName}
+                    handleSingleRouteClick={() => handleSingleRouteClick()}
                   />
                 );
               })}
 
               {navItemsMock.map(({ icon, menuName }, index) => {
-                const nextValue = navItemsIcons.length + (index + 1);
-
                 return (
                   <NavItemMock
                     icon={icon}
                     onClick={handleMockClick}
-                    value={nextValue}
-                    className={disableHoverEffect}
+                    value={menuName}
+                    className={mergeClasses(disableHoverEffect, styles.cursorPointer)}
                   >
                     {openNav && menuName}
                   </NavItemMock>
@@ -179,7 +139,7 @@ export const Navbar = () => {
             </>
           )}
         </NavDrawerBody>
-        <NavDrawerFooter style={{ overflowX: 'hidden' }}>
+        <NavDrawerFooter className={styles.noOverflowX}>
           <div className={mergeClasses(styles.center, styles.btnFooterPadding)}>
             {openNav ? (
               <Button>Sign out</Button>

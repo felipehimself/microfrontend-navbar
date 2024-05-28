@@ -105,7 +105,7 @@ export const useStyles = makeStyles({
   },
 
   btnFooterPadding: {
-    paddingBottom: '1.5rem',
+    paddingBottom: '1rem',
   },
 
   headerActions: {
@@ -119,4 +119,22 @@ export const useStyles = makeStyles({
       color: '#B878B6',
     },
   },
+
+  cursorContextMenu: {
+    cursor: 'context-menu',
+  },
+
+
+  cursorPointer: {
+    cursor: 'pointer',
+  },
+
+  drawerHeaderHamburguerContainer: {
+    display: 'flex',
+    justifyContent: 'flex-end'
+  },
+
+  noOverflowX: {
+    overflowX: 'hidden'
+  }
 });

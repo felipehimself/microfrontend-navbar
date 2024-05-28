@@ -1,3 +1,4 @@
+import { useStyles } from '@/styles';
 import {
   Toast,
   ToastIntent,
@@ -10,13 +11,15 @@ export const useToaster = (toasterId: string, intent: ToastIntent = 'info') => {
 
   const { dispatchToast } = useToastController(toasterId);
 
+  const styles = useStyles();
+
   const notify = () => {
     dispatchToast(
       <Toast>
         <ToastTitle
           action={
             <ToastTrigger>
-              <span style={{ cursor: 'pointer' }}>Dismiss</span>
+              <span className={styles.cursorPointer}>Dismiss</span>
             </ToastTrigger>
           }
         >

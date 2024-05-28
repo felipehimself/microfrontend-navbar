@@ -9,6 +9,8 @@ import {
   DocumentBulletListMultiple20Regular,
   HeartPulse20Filled,
   HeartPulse20Regular,
+  Home20Filled,
+  Home20Regular,
   MegaphoneLoud20Filled,
   MegaphoneLoud20Regular,
   NotePin20Filled,
@@ -32,10 +34,7 @@ import {
   bundleIcon,
 } from '@fluentui/react-icons';
 
-export { NavigationFilled } from '@fluentui/react-icons';
-export { WeatherSunnyFilled } from '@fluentui/react-icons';
-export { WeatherMoon20Filled } from '@fluentui/react-icons';
-export { Home20Filled } from '@fluentui/react-icons';
+export { Home20Filled, NavigationFilled, WeatherMoon20Filled, WeatherSunnyFilled } from '@fluentui/react-icons';
 
 export const Person = bundleIcon(PersonFilled, PersonRegular);
 
@@ -45,6 +44,8 @@ export const Announcements = bundleIcon(
   MegaphoneLoud20Filled,
   MegaphoneLoud20Regular
 );
+
+export const Home = bundleIcon(Home20Filled, Home20Regular);
 export const Dashboard = bundleIcon(Board20Filled, Board20Regular);
 export const EmployeeSpotlight = bundleIcon(
   PersonLightbulb20Filled,
