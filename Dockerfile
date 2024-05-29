@@ -10,6 +10,11 @@ COPY . .
 
 RUN npm run build
 
+# Adds app version to nginx
+RUN apk add --no-cache jq
+RUN jq -n --arg version "$(jq -r '.version' package.json)" '{ version: $version }' > ./dist/microfrontend-navbar/version.json
+
+
 FROM nginx:alpine
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
