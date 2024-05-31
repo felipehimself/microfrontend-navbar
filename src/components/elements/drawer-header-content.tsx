@@ -14,14 +14,14 @@ export const DrawerHeaderContent = (props: TDrawerHeaderContentProps) => {
 
   return (
     <div className={styles.headerContainer}>
-      <div className={styles.drawerHeaderHamburguerContainer} >
+      {/* <div className={styles.drawerHeaderHamburguerContainer} > */}
         <Button
           onClick={props.setOpenNav}
           appearance="transparent"
           icon={<NavigationFilled />}
           className={styles.hamburger}
         />
-      </div>
+      {/* </div> */}
 
       <div className={styles.headerAvatar}>
         <Avatar

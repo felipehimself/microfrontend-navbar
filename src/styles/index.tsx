@@ -39,7 +39,7 @@ export const useStyles = makeStyles({
 
   rootSm: {
     ...baseRoot,
-    width: '3.6rem',
+    width: '3.8rem',
   },
 
   content: {
@@ -63,7 +63,7 @@ export const useStyles = makeStyles({
   hamburger: {
     color: tokens.colorNeutralForeground2,
     textDecorationLine: 'none',
-    marginRight: '-0.6rem',
+    // marginRight: '-0.6rem',
   },
 
   noHover: {
@@ -81,6 +81,7 @@ export const useStyles = makeStyles({
   headerContainer: {
     display: 'flex',
     flexDirection: 'column',
+    alignItems: 'flex-start',
     gap: '0.5rem',
     marginBottom: '0.6rem',
   },
