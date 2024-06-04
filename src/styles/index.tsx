@@ -25,7 +25,9 @@ const baseRoot = {
   display: 'flex',
   height: '100vh',
   transition: 'width 0.3s ease',
+  width: '16.25rem',
 };
+
 export const useStyles = makeStyles({
   changeThemeButton: {
     position: 'fixed',

@@ -25,6 +25,8 @@ import { Skeleton } from './elements/skeleton';
 import { NavItem } from './nav/nav-item';
 
 const navbarChannel = new BroadcastChannel('navbarChannel');
+const navbarSizeChannel = new BroadcastChannel('navbarSizeChannel');
+// const appErrorsChannel = new BroadcastChannel("appErrorsChannel");
 
 // anything as custom props in the mfe-root can be received as props here
 export const Navbar = () => {
@@ -56,6 +58,17 @@ export const Navbar = () => {
     navbarChannel.close();
   };
 
+  // Listen for load app erros and paint in the screen
+  // appErrorsChannel.onmessage = (e) => {
+  //   const appErros = e.data as string[];
+
+  //   appErros.forEach((error) => {
+  //     notify(`Error loading ${error}`);
+  //   });
+
+  //   appErrorsChannel.close();
+  // }
+
   const styles = useStyles();
 
   const disableHoverEffect = useMemo(() => {
@@ -82,6 +95,11 @@ export const Navbar = () => {
 
   const navItemClassName = mergeClasses(disableHoverEffect, styles.noWrap);
 
+  const handleOpenDrawer = () => {
+    setOpenNav(prev => !prev)
+    navbarSizeChannel.postMessage({ openNav: !openNav })
+  }
+
   return (
     <>
       <Button
@@ -95,7 +113,7 @@ export const Navbar = () => {
       <NavDrawer className={drawerClassName} open type="inline" size="small">
         <NavDrawerHeader>
           <NavDrawerHeaderNav>
-            <DrawerHeaderContent setOpenNav={() => setOpenNav(!openNav)} openNav={openNav} />
+            <DrawerHeaderContent setOpenNav={handleOpenDrawer} openNav={openNav} />
           </NavDrawerHeaderNav>
         </NavDrawerHeader>
         <NavDrawerBody className={styles.noOverflowX}>
